@@ -1,0 +1,22 @@
+﻿<div class="row upload_file">
+
+	<div class="col-sm-3">
+
+		<input type="file" data-ngf-select="uploadFiles($file)"  />
+
+	</div>
+
+	<div class="col-sm-9">
+
+		<div>
+			{{ f.name }} {{ f.$error }} {{ f.$errorParam }}
+
+			<div class="progress" data-ng-show="f.progress >= 0">
+				<div style="padding: 4px; color: black; background-color: lightblue; width:{{ f.progress }}%" data-ng-bind="f.progress + '%'">
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</div>

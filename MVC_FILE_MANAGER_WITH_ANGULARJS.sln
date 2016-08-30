@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC_FILE_MANAGER_WITH_ANGULARJS", "MVC_FILE_MANAGER_WITH_ANGULARJS\MVC_FILE_MANAGER_WITH_ANGULARJS.csproj", "{306D2EAF-1490-47CC-AD19-4B05A9DAD73A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcFileManager", "MvcFileManager\MvcFileManager.csproj", "{AAC8CDAB-5A4F-4B8B-B686-2C622D8931C5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{306D2EAF-1490-47CC-AD19-4B05A9DAD73A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{306D2EAF-1490-47CC-AD19-4B05A9DAD73A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{306D2EAF-1490-47CC-AD19-4B05A9DAD73A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{306D2EAF-1490-47CC-AD19-4B05A9DAD73A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAC8CDAB-5A4F-4B8B-B686-2C622D8931C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAC8CDAB-5A4F-4B8B-B686-2C622D8931C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAC8CDAB-5A4F-4B8B-B686-2C622D8931C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAC8CDAB-5A4F-4B8B-B686-2C622D8931C5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

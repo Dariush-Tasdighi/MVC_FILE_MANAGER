@@ -1,0 +1,19 @@
+﻿INSTALL-PACKAGE AutoMapper
+INSTALL-PACKAGE DotNetZip
+
+INSTALL-PACKAGE Microsoft.AspNet.Mvc
+
+INSTALL-PACKAGE T4MVC
+INSTALL-PACKAGE Newtonsoft.Json
+INSTALL-PACKAGE Microsoft.AspNet.Web.Optimization
+
+INSTALL-PACKAGE JQuery
+INSTALL-PACKAGE Bootstrap
+INSTALL-PACKAGE AngularJS
+
+INSTALL-PACKAGE Modernizr
+
+INSTALL-PACKAGE angular-file-upload
+
+Resources نصب در پروژه
+INSTALL-PACKAGE SmartStringResources

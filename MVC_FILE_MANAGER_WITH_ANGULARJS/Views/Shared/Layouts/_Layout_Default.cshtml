@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+	<meta name="viewport" content="width=device-width" />
+
+	<title>@ViewBag.Title</title>
+
+	<link href="@(Links.Content.bootstrap_min_css)" rel="stylesheet" />
+	<link href="@(Links.Content.bootstrap_theme_min_css)" rel="stylesheet" />
+	<link href="@(Links.Content.file_manager_css)" rel="stylesheet" />
+
+	<script src="@(Links.Scripts.jquery_3_1_0_min_js)"></script>
+	<script src="@(Links.Scripts.bootstrap_min_js)"></script>
+	<script src="@(Links.Scripts.angular_min_js)"></script>
+	<script src="@(Links.Scripts.ng_file_upload_min_js)"></script>
+</head>
+<body>
+	<div class="container">
+
+		@RenderBody()
+
+	</div>
+</body>
+</html>

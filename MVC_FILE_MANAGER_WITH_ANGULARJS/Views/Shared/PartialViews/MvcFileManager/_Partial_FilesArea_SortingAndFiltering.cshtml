@@ -1,0 +1,36 @@
+﻿<div class="row files-area-sorting-filtering">
+
+	<div class="col-sm-2">
+		<label class="label label-success">Sort Files</label>
+	</div>
+
+	<div class="col-sm-4">
+		<select class="form-control" data-ng-model="filesSort">
+			<option value="">Not Sorted</option>
+
+			<option value="Name">Name (ASC)</option>
+			<option value="-Name">Name (DES)</option>
+
+			<option value="Length">Length (ASC)</option>
+			<option value="-Length">Length (DES)</option>
+
+			<option value="DisplayLastWrite">Last Write (ASC)</option>
+			<option value="-DisplayLastWrite">Last Write (DES)</option>
+
+			<option value="DisplayCreationTime">Creation Time (ASC)</option>
+			<option value="-DisplayCreationTime">Creation Time (DES)</option>
+
+			<option value="DisplayLastAccessTime">Last Access Time (ASC)</option>
+			<option value="-DisplayLastAccessTime">Last Access Time (DES)</option>
+		</select>
+	</div>
+
+	<div class="col-sm-2">
+		<label class="label label-success">Filter Files</label>
+	</div>
+
+	<div class="col-sm-4">
+		<input type="search" class="form-control" data-ng-model="filesFilter" />
+	</div>
+
+</div>

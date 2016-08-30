@@ -1,0 +1,925 @@
+﻿@{
+	MvcFileManager.Initializer
+		oInitializer = new MvcFileManager.Initializer();
+}
+
+<div class="file-manager" data-ng-app="mainApplication" data-ng-controller="mainController">
+
+	@Html.Partial(MVC.Shared.Views.PartialViews.MvcFileManager._Partial_Path)
+
+	@Html.Partial(MVC.Shared.Views.PartialViews.MvcFileManager._Partial_Buttons)
+
+	@Html.Partial(MVC.Shared.Views.PartialViews.MvcFileManager._Partial_UploadFile)
+
+	@Html.Partial(MVC.Shared.Views.PartialViews.MvcFileManager._Partial_DirectoriesArea)
+
+	@Html.Partial(MVC.Shared.Views.PartialViews.MvcFileManager._Partial_FilesArea)
+
+	@Html.Partial(MVC.Shared.Views.PartialViews.MvcFileManager._Partial_Dialog_General)
+
+	@Html.Partial(MVC.Shared.Views._Partial_Dialog_Loading)
+	@Html.Partial(MVC.Shared.Views._Partial_Dialog_Message)
+
+</div>
+
+<script>
+
+	var varMainApplication =
+		angular.module('mainApplication', ['ngFileUpload']);
+
+	varMainApplication.controller('mainController', function ($scope, $http, $timeout, Upload) {
+
+		$scope.currentPath = '/';
+
+		displayDirectoriesAndFiles($scope, $http, $scope.currentPath);
+
+		// **************************************************
+		$scope.$on('doSomethingAfterRepeatDone', function (e) {
+
+			$('[data-toggle="tooltip"]').tooltip();
+
+		});
+		// **************************************************
+
+		// **************************************************
+		$scope.uploadFiles = function (file) {
+
+			$scope.f = file;
+
+			if (file && !file.$error) {
+
+				file.upload = Upload.upload({
+
+					file: file,
+					fields: { 'path': $scope.path },
+					url: '@(oInitializer.Path)/UploadFile',
+
+				});
+
+				file.upload.then(function (response) {
+
+					$timeout(function () {
+
+						//file.result = response.data;
+
+						$scope.files.push(response.data.Data);
+
+					});
+
+				}, function (response) {
+
+					if (response.status > 0) {
+
+						$scope.messageState = 1;
+						$scope.messageTitle = 'Error';
+						$scope.messageText = 'Error on uploading!';
+
+					}
+
+				});
+
+				file.upload.progress(function (e) {
+
+					file.progress =
+						Math.min(100, parseInt(100.0 * e.loaded / e.total));
+
+				});
+
+			}
+
+		};
+		// **************************************************
+
+		// **************************************************
+		$scope.clickOnPath =
+			function (item) {
+
+				displayDirectoriesAndFiles($scope, $http, item.Path);
+
+			};
+		// **************************************************
+
+		// **************************************************
+		$scope.openDirectory =
+			function (item) {
+
+				$scope.path =
+					$scope.path + item.Name;
+
+				displayDirectoriesAndFiles($scope, $http, $scope.path);
+
+			};
+		// **************************************************
+
+		// **************************************************
+		$scope.clickOnRefreshButton =
+			function () {
+
+				displayDirectoriesAndFiles($scope, $http, $scope.path);
+
+			};
+		// **************************************************
+
+		// **************************************************
+		$scope.clickOnCreateDirectoryButton =
+			function () {
+
+				$scope.generalDialogState = 1;
+				$scope.generalDialogText = '';
+				$scope.generalDialogLabel = 'Directory Name';
+				$scope.generalDialogTitle = 'Create Directory';
+
+				$('div#generalDialog').modal();
+
+			};
+		// **************************************************
+
+		// **************************************************
+		$scope.clickOnDoCreateDirectoryButton =
+			function () {
+
+				$('div#loadingDialog').modal({ keyboard: false, backdrop: false, });
+
+				var varData =
+					{
+						path: $scope.path,
+						directoryName: $scope.generalDialogText,
+					};
+
+				$http.post('@(oInitializer.Path)/CreateDirectory', varData)
+					.error(function (response) {
+
+						$('div#loadingDialog').modal('toggle');
+
+						$scope.messageState = 1;
+						$scope.messageTitle = 'Error';
+						$scope.messageText = 'Error on sending/receiving data!';
+
+						$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+					})
+					.success(function (response) {
+
+						$('div#loadingDialog').modal('toggle');
+
+						$scope.messageState = response.State;
+						$scope.messageText = response.MessageText;
+						$scope.messageTitle = response.MessageTitle;
+
+						if (response.State == 0) {
+
+							$scope.directories.push(response.Data);
+
+							$('div#generalDialog').modal('toggle');
+
+						}
+
+						$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+					});
+
+			};
+		// **************************************************
+
+		// **************************************************
+		$scope.rename =
+			function (item) {
+
+				$scope.selectedItem = item;
+				$scope.generalDialogHiddenText = item.Name;
+
+				$scope.generalDialogState = 2;
+				$scope.generalDialogText = item.Name;
+				$scope.generalDialogLabel = 'Rename';
+				$scope.generalDialogTitle = 'Rename';
+
+				$('div#generalDialog').modal();
+
+			};
+		// **************************************************
+
+		// **************************************************
+		$scope.clickOnInfoButton =
+			function () {
+
+				$scope.messageState = 3;
+				$scope.messageTitle = 'Info';
+				$scope.messageText =
+					'Mr. Dariush Tasdighi - 0098-912-108-7461 - DariushT@GMail.com';
+
+				$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+			};
+		// **************************************************
+
+		// **************************************************
+		$scope.clickOnDoRenameButton =
+			function () {
+
+				$('div#loadingDialog').modal({ keyboard: false, backdrop: false, });
+
+				var varData =
+					{
+						path: $scope.path,
+						newName: $scope.generalDialogText,
+						oldName: $scope.generalDialogHiddenText,
+					};
+
+				$http.post('@(oInitializer.Path)/Rename', varData)
+					.error(function (response) {
+
+						$('div#loadingDialog').modal('toggle');
+
+						$scope.messageState = 1;
+						$scope.messageTitle = 'Error';
+						$scope.messageText = 'Error on sending/receiving data!';
+
+						$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+					})
+					.success(function (response) {
+
+						$('div#loadingDialog').modal('toggle');
+
+						$scope.messageState = response.State;
+						$scope.messageText = response.MessageText;
+						$scope.messageTitle = response.MessageTitle;
+
+						if (response.State == 0) {
+
+							$scope.selectedItem.Name = $scope.generalDialogText;
+
+							$('div#generalDialog').modal('toggle');
+
+						}
+
+						$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+					});
+
+			};
+		// **************************************************
+
+		// **************************************************
+		$scope.clickOnCompressButton =
+			function () {
+
+				var blnResult =
+					isAnyDirectoriesOrFilesSelected($scope);
+
+				if (blnResult == false) {
+
+					displayErrorWhenThereIsNotAnySelectedDirectoriesOrFiles($scope);
+
+					return;
+
+				}
+
+				$scope.generalDialogState = 3;
+				$scope.generalDialogText = '';
+				$scope.generalDialogLabel = 'File Name';
+				$scope.generalDialogTitle = 'Compress Selected Directories and Files';
+
+				$('div#generalDialog').modal();
+
+			};
+		// **************************************************
+
+		// **************************************************
+		$scope.clickOnDecompressButton =
+			function () {
+
+				var blnResult =
+					isAnyFilesSelected($scope);
+
+				if (blnResult == false) {
+
+					displayErrorWhenThereIsNotAnySelectedFiles($scope);
+
+					return;
+
+				}
+
+				$('div#loadingDialog').modal({ keyboard: false, backdrop: false, });
+
+				var varResult =
+					getSelectedFiles($scope);
+
+				var varData =
+					{
+						path: $scope.path,
+						files: varResult,
+					};
+
+				$http.post('@(oInitializer.Path)/Decompress', varData)
+					.error(function (response) {
+
+						$('div#loadingDialog').modal('toggle');
+
+						$scope.messageState = 1;
+						$scope.messageTitle = 'Error';
+						$scope.messageText = 'Error on sending/receiving data!';
+
+						$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+					})
+					.success(function (response) {
+
+						$('div#loadingDialog').modal('toggle');
+
+						displayDirectoriesAndFiles($scope, $http, $scope.path);
+
+						//$scope.messageState = response.State;
+						//$scope.messageText = response.MessageText;
+						//$scope.messageTitle = response.MessageTitle;
+
+						//if (response.State == 0) {
+
+						//	displayDirectoriesAndFiles($scope, $http, $scope.path);
+
+						//}
+
+						//$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+					});
+
+			};
+		// **************************************************
+
+		// **************************************************
+		$scope.clickOnDoCompressButton =
+			function () {
+
+				$('div#loadingDialog').modal({ keyboard: false, backdrop: false, });
+
+				var varResult =
+					getSelectedDirectoriesAndFiles($scope);
+
+				var varData =
+					{
+						path: $scope.path,
+						files: varResult.selectedFiles,
+						directories: varResult.selectedDirectories,
+						fileName: $scope.generalDialogText,
+					};
+
+				$http.post('@(oInitializer.Path)/Compress', varData)
+					.error(function (response) {
+
+						$('div#loadingDialog').modal('toggle');
+
+						$scope.messageState = 1;
+						$scope.messageTitle = 'Error';
+						$scope.messageText = 'Error on sending/receiving data!';
+
+						$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+					})
+					.success(function (response) {
+
+						$('div#loadingDialog').modal('toggle');
+
+						$scope.messageState = response.State;
+						$scope.messageText = response.MessageText;
+						$scope.messageTitle = response.MessageTitle;
+
+						if (response.State == 0) {
+
+							$scope.files.push(response.Data.CreatedFile);
+
+							// **************************************************
+							angular.forEach(response.Data.Files, function (fileWithError) {
+
+								angular.forEach($scope.files, function (file) {
+
+									if (fileWithError.Name == file.Name) {
+
+										file.Message = fileWithError.Message;
+
+									}
+
+								});
+
+							});
+							// **************************************************
+
+							// **************************************************
+							angular.forEach(response.Data.Directories, function (directoryWithError) {
+
+								angular.forEach($scope.directories, function (directory) {
+
+									if (directoryWithError.Name == directory.Name) {
+
+										directory.Message = directoryWithError.Message;
+
+									}
+
+								});
+
+							});
+							// **************************************************
+
+							$('div#generalDialog').modal('toggle');
+
+						}
+
+						$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+					});
+
+			};
+		// **************************************************
+
+		// **************************************************
+		$scope.clickOnToggleSlideDirectoriesButton =
+			function () {
+
+				$('div.directories-area').slideToggle();
+
+				var varText =
+					$('button#btnToggleSlideDirectories').text();
+
+				if (varText == 'Hide Directories') {
+
+					$('button#btnToggleSlideDirectories').text('Show Directories');
+
+				}
+				else {
+
+					$('button#btnToggleSlideDirectories').text('Hide Directories');
+
+				}
+
+			};
+		// **************************************************
+
+		// **************************************************
+		$scope.clickOnToggleSlideFilesButton =
+			function () {
+
+				$('div.files-area').slideToggle();
+
+				var varText =
+					$('button#btnToggleSlideFiles').text();
+
+				if (varText == 'Hide Files') {
+
+					$('button#btnToggleSlideFiles').text('Show Files');
+
+				}
+				else {
+
+					$('button#btnToggleSlideFiles').text('Hide Files');
+
+				}
+
+			};
+		// **************************************************
+
+		$scope.clickOnSelectAllButton =
+			function () {
+
+				$scope.clickOnSelectFilesButton();
+				$scope.clickOnSelectDirectoriesButton();
+
+			};
+
+		$scope.clickOnDeselectAllButton =
+			function () {
+
+				$scope.clickOnDeselectFilesButton();
+				$scope.clickOnDeselectDirectoriesButton();
+
+			};
+
+		$scope.clickOnToggleAllButton =
+			function () {
+
+				$scope.clickOnToggleFilesButton();
+				$scope.clickOnToggleDirectoriesButton();
+
+			};
+
+		$scope.clickOnSelectFilesButton =
+			function () {
+
+				angular.forEach($scope.files, function (file) {
+
+					file.IsSelected = true;
+
+				});
+
+			};
+
+		$scope.clickOnDeselectFilesButton =
+			function () {
+
+				angular.forEach($scope.files, function (file) {
+
+					file.IsSelected = false;
+
+				});
+
+			};
+
+		$scope.clickOnToggleFilesButton =
+			function () {
+
+				angular.forEach($scope.files, function (file) {
+
+					file.IsSelected =
+						file.IsSelected ? false : true;
+
+				});
+
+			};
+
+		$scope.clickOnSelectDirectoriesButton =
+			function () {
+
+				angular.forEach($scope.directories, function (directory) {
+
+					directory.IsSelected = true;
+
+				});
+
+			};
+
+		$scope.clickOnDeselectDirectoriesButton =
+			function () {
+
+				angular.forEach($scope.directories, function (directory) {
+
+					directory.IsSelected = false;
+
+				});
+
+			};
+
+		$scope.clickOnToggleDirectoriesButton =
+			function () {
+
+				angular.forEach($scope.directories, function (directory) {
+
+					directory.IsSelected =
+						directory.IsSelected ? false : true;
+
+				});
+
+			};
+
+		$scope.clickOnDeleteButton =
+			function () {
+
+				deleteDirectoriesAndFiles($scope, $http);
+
+			};
+
+	});
+
+	varMainApplication.directive('onRepeatDone', function ($timeout) {
+
+		return {
+
+			restrict: 'A',
+			link: function (scope, element, attr) {
+
+				if (scope.$last === true) {
+
+					$timeout(function () {
+
+						scope.$emit(attr.onRepeatDone);
+
+					});
+
+				}
+
+			},
+
+		};
+
+	});
+
+	function displayDirectoriesAndFiles($scope, $http, newPath) {
+
+		$('div#loadingDialog').modal({ keyboard: false, backdrop: false, });
+
+		var varData =
+			{
+				path: newPath,
+			};
+
+		$http.post('@(oInitializer.Path)/GetDirectoriesAndFiles', varData)
+
+			.error(function (response) {
+
+				$('div#loadingDialog').modal('toggle');
+
+				$scope.messageState = 1;
+				$scope.messageTitle = 'Error';
+				$scope.messageText = 'Error on sending/receiving data!';
+
+				$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+			})
+
+			.success(function (response) {
+
+				$scope.path = response.Data.Path;
+				$scope.files = response.Data.Files;
+				$scope.directories = response.Data.Directories;
+				$scope.pathCollection = response.Data.PathCollection;
+
+				$('div#loadingDialog').modal('toggle');
+
+			});
+
+	}
+
+	function deleteDirectoriesAndFiles($scope, $http) {
+
+		var blnResult =
+			isAnyDirectoriesOrFilesSelected($scope);
+
+		if (blnResult == false) {
+
+			displayErrorWhenThereIsNotAnySelectedDirectoriesOrFiles($scope);
+
+			return;
+
+		}
+
+		if (confirm('Do you want to delete?') == false) {
+
+			return;
+		}
+
+		var varResult =
+			getSelectedDirectoriesAndFiles($scope);
+
+		$('div#loadingDialog').modal({ keyboard: false, backdrop: false, });
+
+		var varData =
+			{
+				path: $scope.path,
+				files: varResult.selectedFiles,
+				directories: varResult.selectedDirectories,
+			};
+
+		$http.post('@(oInitializer.Path)/DeleteDirectoriesAndFiles', varData)
+
+			.error(function (response) {
+
+				$('div#loadingDialog').modal('toggle');
+
+				$scope.messageState = 1;
+				$scope.messageTitle = 'Error';
+				$scope.messageText = 'Error on sending/receiving data!';
+
+				$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+			})
+
+			.success(function (response) {
+
+				$('div#loadingDialog').modal('toggle');
+
+				$scope.messageState = response.State;
+				$scope.messageText = response.MessageText;
+				$scope.messageTitle = response.MessageTitle;
+
+				// **************************************************
+				for (var varIndex = $scope.files.length - 1; varIndex >= 0; varIndex--) {
+
+					var varFile =
+						$scope.files[varIndex];
+
+					if (varFile.IsSelected) {
+
+						angular.forEach(response.Data.Files, function (fileWithError) {
+
+							if (fileWithError.Name == varFile.Name) {
+
+								varFile.IsSelected = false;
+								varFile.Message = fileWithError.Message;
+
+							}
+
+						});
+
+						if (varFile.IsSelected) {
+
+							$scope.files.splice(varIndex, 1);
+
+						}
+
+					}
+
+				}
+				// **************************************************
+
+				// **************************************************
+				for (var varIndex = $scope.directories.length - 1; varIndex >= 0; varIndex--) {
+
+					var varDirectory =
+						$scope.directories[varIndex];
+
+					if (varDirectory.IsSelected) {
+
+						angular.forEach(response.Data.Directories, function (directoryWithError) {
+
+							if (directoryWithError.Name == varDirectory.Name) {
+
+								varDirectory.IsSelected = false;
+								varDirectory.Message = directoryWithError.Message;
+
+							}
+
+						});
+
+						if (varDirectory.IsSelected) {
+
+							$scope.directories.splice(varIndex, 1);
+
+						}
+
+					}
+
+				}
+				// **************************************************
+
+				$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+			});
+
+	}
+
+	// **************************************************
+	// *** Checked **************************************
+	// **************************************************
+	function getSelectedFiles($scope) {
+
+		var varFiles = [];
+
+		angular.forEach($scope.files, function (file) {
+
+			if (file.IsSelected) {
+
+				varFiles.push({ name: file.Name });
+
+			}
+
+		});
+
+		return (varFiles);
+
+	}
+	// **************************************************
+	// *** /Checked *************************************
+	// **************************************************
+
+	// **************************************************
+	// *** Checked **************************************
+	// **************************************************
+	function getSelectedDirectories($scope) {
+
+		var varDirectories = [];
+
+		angular.forEach($scope.directories, function (directory) {
+
+			if (directory.IsSelected) {
+
+				varDirectories.push({ name: directory.Name });
+			}
+
+		});
+
+		return (varDirectories);
+
+	}
+	// **************************************************
+	// *** /Checked *************************************
+	// **************************************************
+
+	// **************************************************
+	// *** Checked **************************************
+	// **************************************************
+	function getSelectedDirectoriesAndFiles($scope) {
+
+		var varResult = {
+
+			selectedFiles: getSelectedFiles($scope),
+			selectedDirectories: getSelectedDirectories($scope),
+
+		};
+
+		return (varResult);
+	}
+	// **************************************************
+	// *** /Checked *************************************
+	// **************************************************
+
+	// **************************************************
+	// *** Checked **************************************
+	// **************************************************
+	function displayErrorWhenThereIsNotAnySelectedFiles($scope) {
+
+		$scope.messageState = 1;
+		$scope.messageTitle = 'Error!';
+		$scope.messageText = 'You did not select any files!';
+
+		$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+	}
+	// **************************************************
+	// *** /Checked *************************************
+	// **************************************************
+
+	// **************************************************
+	// *** Checked **************************************
+	// **************************************************
+	function displayErrorWhenThereIsNotAnySelectedDirectoriesOrFiles($scope) {
+
+		$scope.messageState = 1;
+		$scope.messageTitle = 'Error!';
+		$scope.messageText = 'You did not select any directories or files!';
+
+		$('div#messageDialog').modal({ keyboard: false, backdrop: false, });
+
+	}
+	// **************************************************
+	// *** /Checked *************************************
+	// **************************************************
+
+	// **************************************************
+	// *** Checked **************************************
+	// **************************************************
+	function isAnyFilesSelected($scope) {
+
+		var blnResult = false;
+
+		angular.forEach($scope.files, function (file) {
+
+			file.Message = '';
+
+			if (file.IsSelected) {
+
+				blnResult = true;
+
+			}
+
+		});
+
+		return (blnResult);
+
+	}
+	// **************************************************
+	// *** /Checked *************************************
+	// **************************************************
+
+
+	// **************************************************
+	// *** Checked **************************************
+	// **************************************************
+	function isAnyDirectoriesSelected($scope) {
+
+		var blnResult = false;
+
+		angular.forEach($scope.directories, function (directory) {
+
+			directory.Message = '';
+
+			if (directory.IsSelected) {
+
+				blnResult = true;
+
+			}
+
+		});
+
+		return (blnResult);
+
+	}
+	// **************************************************
+	// *** /Checked *************************************
+	// **************************************************
+
+	// **************************************************
+	// *** Checked **************************************
+	// **************************************************
+	function isAnyDirectoriesOrFilesSelected($scope) {
+
+		var blnAnyFilesSelected =
+			isAnyFilesSelected($scope);
+
+		var blnAnyDirectoriesSelected =
+			isAnyDirectoriesSelected($scope);
+
+		return ((blnAnyFilesSelected) || (blnAnyDirectoriesSelected));
+
+	}
+	// **************************************************
+	// *** /Checked *************************************
+	// **************************************************
+
+</script>
